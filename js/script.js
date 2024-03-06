@@ -5,7 +5,14 @@ const todoList = document.querySelector("#todo-list")
 const editForm = document.querySelector("#edit-form")
 const editInput = document.querySelector("#edit-input")
 const cancelEditBtn = document.querySelector("#cancel-edit-btn")
-const h1 = document.querySelector('h1')
+const searchInput = document.querySelector('#search-input')
+const eraseBtn = document.querySelector('#erase-button')
+const filterBtn = document.querySelector('#filter-select')
+
+const todoContainer = document.querySelector('.todo-container')
+
+
+let oldInputValue
 // =========================Funções====================================
 
 
@@ -39,10 +46,39 @@ const saveTodo = (textInput) => {
     
 }
 
-const toggleForms = () => {
+const toggleForms = (text) => {
     editForm.classList.toggle('hide')
     todoForm.classList.toggle('hide')
     todoList.classList.toggle('hide')
+}
+
+const updateTodo = (editInputValue) => {
+    const todos = document.querySelectorAll('.todo')
+
+    todos.forEach((todo)=> {
+        let todoTitle = todo.querySelector('h3')
+
+        if(todoTitle.innerText === oldInputValue){
+            todoTitle.innerText = editInputValue
+        }
+    })
+
+}
+
+const getSearchTodos = (search) =>  {
+    const todos = document.querySelectorAll('.todo')
+
+    todos.forEach((todo) => {
+        let todoTitle = todo.querySelector('h3').innerText.toLowerCase()
+
+        todo.style.display = 'flex'
+        
+        const lowerCaseSearch = search.toLowerCase()
+        if(!todoTitle.includes(lowerCaseSearch)) {
+            todo.style.display = 'none'
+        }
+    })
+
 }
 
 //======================== Eventos===========================
@@ -63,6 +99,10 @@ document.addEventListener('click', (event) => {
     const parentEl = targetEl.closest(("div"))
     let todoTitle
 
+    if(parentEl && parentEl.querySelector('h3')) {
+        todoTitle = parentEl.querySelector('h3').innerText
+    }
+
     if(targetEl.classList.contains('finish-todo')) {
        parentEl.classList.toggle('done')
     }
@@ -73,10 +113,38 @@ document.addEventListener('click', (event) => {
 
     if(targetEl.classList.contains('edit-todo')) {
         toggleForms()
+
+        editInput.value = todoTitle
+        oldInputValue = todoTitle
     }
 })
 
 cancelEditBtn.addEventListener('click', (event) => {    
     event.preventDefault()
     toggleForms()
+})
+
+editForm.addEventListener('submit', (event) => {
+    event.preventDefault()
+    const editInputValue = editInput.value
+
+    if(editInputValue) {
+        updateTodo(editInputValue)
+    }
+    toggleForms()
+})
+
+
+searchInput.addEventListener('keyup', (event) => {
+    const search = event.target.value
+
+    getSearchTodos(search)
+})
+
+eraseBtn.addEventListener("click", (event) => {
+    event.preventDefault()
+
+    searchInput.value = ''
+
+    searchInput.dispatchEvent(new Event('keyup'))
 })

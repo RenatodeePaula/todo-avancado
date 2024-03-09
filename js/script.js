@@ -7,14 +7,17 @@ const editInput = document.querySelector("#edit-input")
 const cancelEditBtn = document.querySelector("#cancel-edit-btn")
 const searchInput = document.querySelector('#search-input')
 const eraseBtn = document.querySelector('#erase-button')
-const filterBtn = document.querySelector('#filter-select')
+const filterSelected = document.querySelector('#filter-select')
 
 const todoContainer = document.querySelector('.todo-container')
 
 
 let oldInputValue
-// =========================Funções====================================
 
+const  h1 = document.querySelector('h1')
+
+
+// =========================Funções====================================
 
 const saveTodo = (textInput) => {
     const todo = document.createElement('div')
@@ -134,7 +137,6 @@ editForm.addEventListener('submit', (event) => {
     toggleForms()
 })
 
-
 searchInput.addEventListener('keyup', (event) => {
     const search = event.target.value
 
@@ -147,4 +149,33 @@ eraseBtn.addEventListener("click", (event) => {
     searchInput.value = ''
 
     searchInput.dispatchEvent(new Event('keyup'))
+})
+
+function filterTodo(recebFilter, todos) {
+    todos.forEach((ev) => {                 
+    switch(recebFilter){
+        case "all":
+            ev.style.display = "flex"
+        break
+        case "done":
+           ev.classList.contains('done') ? ev.style.display = 'flex' : ev.style.display = 'none'
+        break
+        case "todo":
+            !ev.classList.contains('done') ? ev.style.display = 'flex' : ev.style.display = 'none'
+        break
+    }
+})
+    
+}
+filterSelected.addEventListener('change', (ev) => {
+    
+    const todoFilter = ev.target.value
+
+    const todos = document.querySelectorAll('.todo')   
+    filterTodo(todoFilter, todos)
+    
+  
+        
+    
+
 })

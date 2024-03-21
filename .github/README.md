@@ -1,7 +1,7 @@
 <h1 align="center">Todo Avançado </h1>
 
 <p align="center">
-#Projeto feito para estudo de JavaScript puro, uma lista de tarefas editável e salva no LocalStorage com tecnologias WEB. <br/>
+#Projeto feito para estudo de JavaScript puro, uma lista de tarefas editável com botão para excluir, botão check, campo de pesquisa de tarefas e filtro de tarefas, salvando no LocalStorage com tecnologias WEB. <br/>
 </p>
 
 <p align="center">

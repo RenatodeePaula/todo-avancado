@@ -8,12 +8,9 @@ const cancelEditBtn = document.querySelector("#cancel-edit-btn")
 const searchInput = document.querySelector('#search-input')
 const eraseBtn = document.querySelector('#erase-button')
 const filterSelected = document.querySelector('#filter-select')
-
 const todoContainer = document.querySelector('.todo-container')
 
 let oldInputValue
-
-const  h1 = document.querySelector('h1')
 
 // ========================= Funções ====================================
 const saveTodo = (textInput, done = 0, save = 1) => {
@@ -45,8 +42,7 @@ const saveTodo = (textInput, done = 0, save = 1) => {
     }
     
     if(save) {
-        saveTodoLocalStorage({textInput, done })
-    }
+        saveTodoLocalStorage({textInput, done })    }
     
     todoList.appendChild(todo)
 
@@ -69,6 +65,7 @@ const updateTodo = (editInputValue) => {
 
         if(todoTitle.innerText === oldInputValue){
             todoTitle.innerText = editInputValue
+            updateTodosLocalStorage(oldInputValue, editInputValue)
         }
     })
 }
@@ -105,7 +102,6 @@ const filterTodo = (recebFilter, todos) => {
 }
 
 //======================== Eventos ===========================
-
 // Adicionar tarefas
 todoForm.addEventListener("submit", (e) => {
     e.preventDefault()
@@ -127,6 +123,8 @@ document.addEventListener('click', (event) => {
 
     if(targetEl.classList.contains('finish-todo')) {
        parentEl.classList.toggle('done')
+
+       updateTodoStatusLocalStorage(todoTitle)
     }
 
     if(targetEl.classList.contains('remove-todo')) {
@@ -165,9 +163,7 @@ searchInput.addEventListener('keyup', (event) => {
 
 eraseBtn.addEventListener("click", (event) => {
     event.preventDefault()
-
     searchInput.value = ''
-
     searchInput.dispatchEvent(new Event('keyup'))
 })
 
@@ -180,7 +176,6 @@ filterSelected.addEventListener('change', (ev) => {
 })
 
 //======================== Local Storage ===========================
-
 const getTodosLocalStorage = () =>  {
     const todos = JSON.parse(localStorage.getItem('todos')) || []
     
@@ -196,15 +191,10 @@ const loadTodos = () => {
 }
 
 const saveTodoLocalStorage = (todo) => {
-    // pegar todos os todos da ls
     const todos = getTodosLocalStorage()
-
-    // add o novo todo no arr
     todos.push(todo)
 
-    // salvar tudo na ls
     localStorage.setItem("todos", JSON.stringify(todos))
-
 }
 
 const removeTodoLocalStorage = (todoText) => {
@@ -213,6 +203,24 @@ const removeTodoLocalStorage = (todoText) => {
     const filteredTodos = todos.filter((todo) => todo.textInput != todoText);
   
     localStorage.setItem("todos", JSON.stringify(filteredTodos));
-  };
+}
+
+const updateTodoStatusLocalStorage = (todoText) => {
+    const todos = getTodosLocalStorage()
+
+    todos.map( (todo) => 
+    todo.textInput === todoText ? (todo.done = !todo.done) : null
+)
+    localStorage.setItem("todos", JSON.stringify(todos))
+}
+
+const updateTodosLocalStorage = (todoOldText, todoNewText) => {
+    const todos = getTodosLocalStorage()
+
+    todos.map( (todo) => 
+        todo.textInput === todoOldText ? (todo.textInput = todoNewText) : null
+)
+    localStorage.setItem("todos", JSON.stringify(todos))
+}
 
 loadTodos()

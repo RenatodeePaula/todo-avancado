@@ -11,15 +11,12 @@ const filterSelected = document.querySelector('#filter-select')
 
 const todoContainer = document.querySelector('.todo-container')
 
-
 let oldInputValue
 
 const  h1 = document.querySelector('h1')
 
-
-// =========================Funções====================================
-
-const saveTodo = (textInput) => {
+// ========================= Funções ====================================
+const saveTodo = (textInput, done = 0, save = 1) => {
     const todo = document.createElement('div')
     todo.classList.add('todo')
     
@@ -41,13 +38,22 @@ const saveTodo = (textInput) => {
     deleteBtn.classList.add('remove-todo')
     deleteBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>'
     todo.appendChild(deleteBtn)
-
+    
+    // utilizando dados da localStorage
+    if(done) {
+        todo.classList.add('done')
+    }
+    
+    if(save) {
+        saveTodoLocalStorage({textInput, done })
+    }
+    
     todoList.appendChild(todo)
 
     todoInput.value = ""
-    todoInput.focus()    
-    
+    todoInput.focus()        
 }
+
 
 const toggleForms = (text) => {
     editForm.classList.toggle('hide')
@@ -65,7 +71,6 @@ const updateTodo = (editInputValue) => {
             todoTitle.innerText = editInputValue
         }
     })
-
 }
 
 const getSearchTodos = (search) =>  {
@@ -81,10 +86,25 @@ const getSearchTodos = (search) =>  {
             todo.style.display = 'none'
         }
     })
-
 }
 
-//======================== Eventos===========================
+const filterTodo = (recebFilter, todos) => {
+    todos.forEach((ev) => {                 
+    switch(recebFilter){
+        case "all":
+            ev.style.display = "flex"
+        break
+        case "done":
+           ev.classList.contains('done') ? ev.style.display = 'flex' : ev.style.display = 'none'
+        break
+        case "todo":
+            !ev.classList.contains('done') ? ev.style.display = 'flex' : ev.style.display = 'none'
+        break
+    }
+})    
+}
+
+//======================== Eventos ===========================
 
 // Adicionar tarefas
 todoForm.addEventListener("submit", (e) => {
@@ -96,7 +116,6 @@ todoForm.addEventListener("submit", (e) => {
 })
 
 // Confirmar (Check), editar e excluir tarefas
-
 document.addEventListener('click', (event) => {
     const targetEl = event.target
     const parentEl = targetEl.closest(("div"))
@@ -112,6 +131,7 @@ document.addEventListener('click', (event) => {
 
     if(targetEl.classList.contains('remove-todo')) {
         parentEl.remove()
+        removeTodoLocalStorage(todoTitle)
     }
 
     if(targetEl.classList.contains('edit-todo')) {
@@ -151,31 +171,48 @@ eraseBtn.addEventListener("click", (event) => {
     searchInput.dispatchEvent(new Event('keyup'))
 })
 
-function filterTodo(recebFilter, todos) {
-    todos.forEach((ev) => {                 
-    switch(recebFilter){
-        case "all":
-            ev.style.display = "flex"
-        break
-        case "done":
-           ev.classList.contains('done') ? ev.style.display = 'flex' : ev.style.display = 'none'
-        break
-        case "todo":
-            !ev.classList.contains('done') ? ev.style.display = 'flex' : ev.style.display = 'none'
-        break
-    }
-})
-    
-}
-filterSelected.addEventListener('change', (ev) => {
-    
+
+filterSelected.addEventListener('change', (ev) => {    
     const todoFilter = ev.target.value
 
     const todos = document.querySelectorAll('.todo')   
-    filterTodo(todoFilter, todos)
-    
-  
-        
-    
-
+    filterTodo(todoFilter, todos)  
 })
+
+//======================== Local Storage ===========================
+
+const getTodosLocalStorage = () =>  {
+    const todos = JSON.parse(localStorage.getItem('todos')) || []
+    
+    return todos
+}
+
+const loadTodos = () => {
+    const todos = getTodosLocalStorage()
+
+    todos.forEach((todo) => {
+      saveTodo(todo.textInput, todo.done, 0)  
+    })
+}
+
+const saveTodoLocalStorage = (todo) => {
+    // pegar todos os todos da ls
+    const todos = getTodosLocalStorage()
+
+    // add o novo todo no arr
+    todos.push(todo)
+
+    // salvar tudo na ls
+    localStorage.setItem("todos", JSON.stringify(todos))
+
+}
+
+const removeTodoLocalStorage = (todoText) => {
+    const todos = getTodosLocalStorage();
+  
+    const filteredTodos = todos.filter((todo) => todo.textInput != todoText);
+  
+    localStorage.setItem("todos", JSON.stringify(filteredTodos));
+  };
+
+loadTodos()
